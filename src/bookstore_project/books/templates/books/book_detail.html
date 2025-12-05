@@ -1,0 +1,297 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="book-detail-container">
+    <div class="book-main-info">
+        <div class="book-image">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+            {% else %}
+            <div class="no-cover">📖 Нет обложки</div>
+            {% endif %}
+        </div>
+        
+        <div class="book-info">
+            <h1 class="book-title">{{ book.title }}</h1>
+            <p class="book-author">
+                Автор: <a href="{% url 'author_detail' book.author.id %}">{{ book.author.name }}</a>
+            </p>
+            
+            <div class="book-genres">
+                {% for genre in book.genres.all %}
+                <span class="genre-tag">{{ genre.name }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="book-price">{{ book.price }} ₽</div>
+            
+            <button class="add-to-cart-btn">Добавить в корзину</button>
+            
+            <div class="book-description">
+                <h3>Описание</h3>
+                <p>{{ book.description }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if similar_books %}
+    <div class="similar-books">
+        <h2>Похожие книги</h2>
+        <div class="similar-books-grid">
+            {% for similar_book in similar_books %}
+            <div class="similar-book-card">
+                {% if similar_book.cover_image %}
+                <img src="{{ similar_book.cover_image.url }}" alt="{{ similar_book.title }}">
+                {% else %}
+                <div class="no-cover-small">📖</div>
+                {% endif %}
+                <div class="similar-book-title">{{ similar_book.title }}</div>
+                <div class="similar-book-author">{{ similar_book.author.name }}</div>
+                <div class="similar-book-price">{{ similar_book.price }} ₽</div>
+                <a href="{% url 'book_detail' similar_book.id %}" class="btn">Подробнее</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="reviews-section">
+        <h2>Отзывы</h2>
+        
+        {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <strong class="review-user">{{ review.user.username }}</strong>
+                    <div class="review-rating">
+                        Рейтинг: {{ review.rating }}/5
+                    </div>
+                </div>
+                
+                {% if review.text %}
+                <p class="review-text">{{ review.text }}</p>
+                {% endif %}
+                
+                <div class="review-date">
+                    {{ review.created_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-reviews">Пока нет отзывов на эту книгу</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.book-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.book-main-info {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.book-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.no-cover {
+    width: 100%;
+    height: 400px;
+    background: #ecf0f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #7f8c8d;
+    font-size: 1.2rem;
+}
+
+.book-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.book-author {
+    font-size: 1.3rem;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+.book-author a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.book-genres {
+    margin-bottom: 20px;
+}
+
+.genre-tag {
+    background: #3498db;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.book-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 30px 0;
+}
+
+.add-to-cart-btn {
+    background: #27ae60;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-bottom: 30px;
+}
+
+.add-to-cart-btn:hover {
+    background: #219a52;
+}
+
+.book-description h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.book-description p {
+    line-height: 1.8;
+    color: #555;
+}
+
+.similar-books {
+    border-top: 2px solid #ecf0f1;
+    padding-top: 30px;
+    margin-bottom: 40px;
+}
+
+.similar-books h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.similar-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.similar-book-card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.similar-book-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.no-cover-small {
+    width: 100%;
+    height: 150px;
+    background: #ecf0f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    color: #7f8c8d;
+    font-size: 1.5rem;
+}
+
+.similar-book-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.similar-book-author {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.similar-book-price {
+    font-weight: bold;
+    color: #27ae60;
+    margin: 10px 0;
+}
+
+.reviews-section {
+    border-top: 2px solid #ecf0f1;
+    padding-top: 30px;
+}
+
+.reviews-section h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.review-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-user {
+    color: #2c3e50;
+}
+
+.review-rating {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+.review-text {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.review-date {
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.no-reviews {
+    color: #7f8c8d;
+    text-align: center;
+    padding: 40px;
+    font-style: italic;
+}
+</style>
+{% endblock %}

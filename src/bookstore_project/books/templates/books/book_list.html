@@ -1,0 +1,131 @@
+{% extends 'books/base.html' %} {% block content %}
+<div
+  style="
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  "
+>
+  <h1>Каталог книг</h1>
+
+  <!-- Форма поиска -->
+  <form method="get style="display: flex; gap: 0.5rem">
+    <input
+      type="text"
+      name="search"
+      placeholder="Поиск книг..."
+      value="{{ request.GET.search }}"
+      style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px"
+    />
+    <button type="submit" class="btn">Найти</button>
+  </form>
+</div>
+
+<!-- Фильтры по жанрам -->
+<div style="margin-bottom: 2rem">
+  <h3 style="margin-bottom: 1rem">Фильтр по жанрам:</h3>
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap">
+    <a
+      href="{% url 'book_list' %}"
+      class="btn"
+      style="background: {% if not request.GET.genre %} #27ae60 {% else %} #3498db {% endif %}"
+      >Все</a
+    >
+    {% for genre in genres %}
+    <a
+      href="?genre={{ genre.id }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+      class="btn"
+      style="background: {% if request.GET.genre == genre.id|stringformat:'i' %}#27ae60{% else %}#3498db{% endif %}"
+    >
+      {{ genre.name }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Сетка книг -->
+<div class="book-grid">
+  {% for book in page_obj %}
+  <div class="book-card">
+    {% if book.cover_image %}
+    <img
+      src="{{ book.cover_image.url }}"
+      alt="{{ book.title }}"
+      style="
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+      "
+    />
+    {% else %}
+    <div
+      style="
+        width: 100%;
+        height: 200px;
+        background: #ecf0f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+      "
+    >
+      📖 Нет обложки
+    </div>
+    {% endif %}
+    <div class="book-title">{{ book.title }}</div>
+    <div class="book-author">{{ book.author.name }}</div>
+    <div style="margin: 0.5rem 0">
+      {% for genre in book.genres.all %}
+      <span
+        style="
+          background: #ecf0f1;
+          padding: 0.2rem 0.5rem;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          margin-right: 0.3rem;
+        "
+        >{{ genre.name }}</span
+      >
+      {% endfor %}
+    </div>
+    <div class="book-price">{{ book.price }} ₽</div>
+    <a href="{% url 'book_detail' book.id %}" class="btn">Подробнее</a>
+  </div>
+  {% empty %}
+  <div style="grid-column: 1 / -1; text-align: center; padding: 2rem">
+    <p style="font-size: 1.2rem; color: #7f8c8d">Книги не найдены</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Пагинация -->
+{% if page_obj.has_other_pages %}
+<div
+  style="display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem"
+>
+  {% if page_obj.has_previous %}
+  <a
+    href="?page={{ page_obj.previous_page_number }}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+    class="btn"
+    >Назад</a
+  >
+  {% endif %}
+
+  <span style="padding: 0.5rem 1rem; background: white; border-radius: 4px">
+    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+  </span>
+
+  {% if page_obj.has_next %}
+  <a
+    href="?page={{ page_obj.next_page_number }}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+    class="btn"
+    >Вперед</a
+  >
+  {% endif %}
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'books/base.html' %} {% block content %}
+<div style="text-align: center; margin-bottom: 3rem">
+  <h1 style="font-size: 2.5rem; margin-bottom: 1rem">
+    Добро пожаловать в книжный магазин
+  </h1>
+  <p style="font-size: 1.2rem; color: #7f8c8d">
+    Откройте для себя мир увлекательных книг
+  </p>
+</div>
+
+<!-- Новинки -->
+<h2 style="margin-bottom: 1rem">Новинки</h2>
+<div class="book-grid">
+  {% for book in latest_books %}
+  <div class="book-card">
+    {% if book.cover_image %}
+    <img
+      src="{{ book.cover_image.url }}"
+      alt="{{ book.title }}"
+      style="
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+      "
+    />
+    {% else %}
+    <div
+      style="
+        width: 100%;
+        height: 200px;
+        background: #ecf0f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+      "
+    >
+      📖 Нет обложки
+    </div>
+    {% endif %}
+    <div class="book-title">{{ book.title }}</div>
+    <div class="book-author">{{ book.author.name }}</div>
+    <div class="book-price">{{ book.price }} ₽</div>
+    <a href="{% url 'book_detail' book.id %}" class="btn">Подробнее</a>
+  </div>
+  {% empty %}
+  <p>Пока нет книг в каталоге.</p>
+  {% endfor %}
+</div>
+
+<!-- AI Рекомендации -->
+{% if popular_books %}
+<div style="margin-top: 3rem">
+  <h2 style="margin-bottom: 1.5rem">Рекомендуем вам</h2>
+  <div class="book-grid">
+    {% for book in popular_books %}
+    <div class="book-card">
+      {% if book.cover_image %}
+      <img
+        src="{{ book.cover_image.url }}"
+        alt="{{ book.title }}"
+        style="
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          border-radius: 4px;
+          margin-bottom: 1rem;
+        "
+      />
+      {% else %}
+      <div
+        style="
+          width: 100%;
+          height: 200px;
+          background: #ecf0f1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          margin-bottom: 1rem;
+          color: #7f8c8d;
+        "
+      >
+        📖 Нет обложки
+      </div>
+      {% endif %}
+      <div class="book-title">{{ book.title }}</div>
+      <div class="book-author">{{ book.author.name }}</div>
+      <div class="book-price">{{ book.price }} ₽</div>
+      <a href="{% url 'book_detail' book.id %}" class="btn">Подробнее</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Призыв к действию -->
+<div
+  style="
+    background: #2c3e50;
+    color: white;
+    padding: 3rem;
+    border-radius: 8px;
+    margin-top: 3rem;
+    text-align: center;
+  "
+>
+  <h2 style="margin-bottom: 1rem">Найдите свою следующую любимую книгу</h2>
+  <p style="margin-bottom: 2rem; font-size: 1.1rem">
+    Наша AI-система подберет книги именно для вас
+  </p>
+  <a
+    href="{% url 'book_list' %}"
+    class="btn"
+    style="background: #3498db; padding: 1rem 2rem; font-size: 1.1rem"
+  >
+    Смотреть все книги
+  </a>
+</div>
+{% endblock %}
